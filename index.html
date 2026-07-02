@@ -391,9 +391,8 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-
   <button class="fchip" onclick="setFilter('gasto',this)">💸 Gastos</button>
   <button class="fchip" onclick="setFilter('ingreso',this)">💰 Ingresos</button>
   <button class="fchip" onclick="setFilter('ahorro',this)">🎯 Ahorro / Inversión</button>
-  <button class="fchip" onclick="setFilter('super',this)">🛒 Super</button>
-  <button class="fchip" onclick="setFilter('ocio',this)">🎭 Ocio</button>
-  <button class="fchip" onclick="setFilter('salidas',this)">🍻 Salidas</button>
+  <button class="fchip" onclick="setFilter('comida',this)">🍽️ Comida</button>
+  <button class="fchip" onclick="setFilter('ocio',this)">🎭 Ocio y salidas</button>
   <button class="fchip" onclick="setFilter('nafta',this)">⛽ Nafta</button>
 </div>
 <div id="cat-budget-bar" style="display:none;margin:0 14px 8px;background:var(--pl);border-radius:12px;padding:12px 14px">
@@ -466,7 +465,15 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-
       <span class="chev">›</span>
     </div>
     <div class="cfg-item" onclick="openM('m-dist')">
-      <div class="cfg-left"><div class="cfg-ico ci-p">📊</div><div><div class="cfg-lbl">Distribución del ingreso</div><div class="cfg-val" id="cfg-dist-val">Ahorro 25% · Super 20% · Ocio 10%</div></div></div>
+      <div class="cfg-left"><div class="cfg-ico ci-p">📊</div><div><div class="cfg-lbl">Distribución del ingreso</div><div class="cfg-val" id="cfg-dist-val">Comida 20% · Ocio 10% · Ahorro 25% · Emerg. 2%</div></div></div>
+      <span class="chev">›</span>
+    </div>
+    <div class="cfg-item" onclick="openM('m-ciudad')">
+      <div class="cfg-left"><div class="cfg-ico ci-p">📍</div><div><div class="cfg-lbl">Ciudad</div><div class="cfg-val" id="cfg-ciudad">La Plata</div></div></div>
+      <span class="chev">›</span>
+    </div>
+    <div class="cfg-item" onclick="openM('m-millas')">
+      <div class="cfg-left"><div class="cfg-ico ci-pu">✈️</div><div><div class="cfg-lbl">Tarjeta para millas</div><div class="cfg-val" id="cfg-millas">Sin configurar</div></div></div>
       <span class="chev">›</span>
     </div>
     <div class="cfg-item" onclick="openM('m-notif')">
@@ -537,12 +544,13 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-
 <!-- DISTRIBUCIÓN -->
 <div id="m-dist" class="ov"><div class="sheet">
   <div class="sh-handle"></div><div class="sh-title">Distribución del ingreso</div>
-  <div class="info-box"><p>Primero se descuentan tus <strong>servicios fijos</strong>. Luego distribuís el resto. El porcentaje restante queda libre para gastos variables.</p></div>
+  <div class="info-box"><p>Los <strong>Gastos fijos</strong> se descuentan automáticamente de tus servicios configurados. Distribuís el ingreso restante. El total puede llegar al 100%.</p></div>
   <div style="background:var(--gnl);border-radius:10px;padding:10px 14px;margin-bottom:14px;font-size:12px;color:#0F6040" id="dist-preview">Configurá tu ingreso para ver el cálculo.</div>
-  <div class="fg"><label class="fl">% Ahorro e Inversión</label><input class="fi" type="number" id="d-a" placeholder="25" min="0" max="80" inputmode="decimal" oninput="previewDist()"></div>
-  <div class="fg"><label class="fl">% Supermercado</label><input class="fi" type="number" id="d-s" placeholder="20" min="0" max="80" inputmode="decimal" oninput="previewDist()"></div>
-  <div class="fg"><label class="fl">% Ocio y salidas</label><input class="fi" type="number" id="d-o" placeholder="10" min="0" max="80" inputmode="decimal" oninput="previewDist()"></div>
-  <div class="fg"><label class="fl">% Fondo de emergencia (mín. 2% sugerido)</label><input class="fi" type="number" id="d-e" placeholder="2" min="0" max="20" inputmode="decimal" oninput="previewDist()"></div>
+  <div class="fg"><label class="fl">% Gastos fijos (servicios configurados)</label><input class="fi" type="number" id="d-f" placeholder="—" min="0" max="100" inputmode="decimal" readonly style="background:var(--ps);color:var(--gy)" title="Se calcula automáticamente"></div>
+  <div class="fg"><label class="fl">% Comida</label><input class="fi" type="number" id="d-s" placeholder="20" min="0" max="100" inputmode="decimal" oninput="previewDist()"></div>
+  <div class="fg"><label class="fl">% Ocio y salidas</label><input class="fi" type="number" id="d-o" placeholder="10" min="0" max="100" inputmode="decimal" oninput="previewDist()"></div>
+  <div class="fg"><label class="fl">% Ahorro e Inversión</label><input class="fi" type="number" id="d-a" placeholder="25" min="0" max="100" inputmode="decimal" oninput="previewDist()"></div>
+  <div class="fg"><label class="fl">% Fondo de emergencia (mín. 2% sugerido)</label><input class="fi" type="number" id="d-e" placeholder="2" min="0" max="100" inputmode="decimal" oninput="previewDist()"></div>
   <button class="btn-primary" onclick="saveDist()">Guardar distribución</button>
   <button class="btn-cancel" onclick="closeM('m-dist')">Cancelar</button>
 </div></div>
@@ -560,19 +568,17 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-
   <div class="fg" id="cat-grp">
     <label class="fl">Categoría</label>
     <div class="cgrid">
-      <button class="ccat on" onclick="selCat(this)" data-cat="super">🛒<br>Super</button>
+      <button class="ccat on" onclick="selCat(this)" data-cat="comida">🍽️<br>Comida</button>
       <button class="ccat" onclick="selCat(this)" data-cat="servicios">🏠<br>Servicios</button>
       <button class="ccat" onclick="selCat(this)" data-cat="delivery">🍕<br>Delivery</button>
       <button class="ccat" onclick="selCat(this)" data-cat="nafta">⛽<br>Nafta</button>
-      <button class="ccat" onclick="selCat(this)" data-cat="ocio">🎭<br>Ocio</button>
-      <button class="ccat" onclick="selCat(this)" data-cat="salidas">🍻<br>Salidas</button>
+      <button class="ccat" onclick="selCat(this)" data-cat="ocio">🎭<br>Ocio y salidas</button>
       <button class="ccat" onclick="selCat(this)" data-cat="pasajes">✈️<br>Pasajes</button>
       <button class="ccat" onclick="selCat(this)" data-cat="alquiler">🏘️<br>Alquiler</button>
       <button class="ccat" onclick="selCat(this)" data-cat="salud">❤️<br>Salud</button>
       <button class="ccat" onclick="selCat(this)" data-cat="educacion">📚<br>Educación</button>
       <button class="ccat" onclick="selCat(this)" data-cat="adobe">🎨<br>Adobe</button>
       <button class="ccat" onclick="selCat(this)" data-cat="patente">🚗<br>Patente</button>
-      <button class="ccat" onclick="selCat(this)" data-cat="panaderia">🥐<br>Panadería</button>
       <button class="ccat" onclick="selCat(this)" data-cat="hogar">🛋️<br>Hogar</button>
       <button class="ccat" onclick="selCat(this)" data-cat="ropa">👕<br>Ropa</button>
       <button class="ccat" onclick="selCat(this)" data-cat="otros">📦<br>Otros</button>
@@ -685,8 +691,45 @@ body{font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Segoe UI",sans-
   <button class="btn-cancel" onclick="closeM('m-notif')">Cerrar</button>
 </div></div>
 
-<!-- RESET -->
-<div id="m-reset" class="ov"><div class="sheet">
+<!-- CIUDAD -->
+<div id="m-ciudad" class="ov"><div class="sheet">
+  <div class="sh-handle"></div><div class="sh-title">Ciudad 📍</div>
+  <div class="sh-sub">Las recomendaciones de eventos y comercios se adaptarán a tu ciudad.</div>
+  <div class="fg"><label class="fl">Seleccioná tu ciudad</label>
+    <select class="fs" id="ciudad-sel">
+      <option value="La Plata">La Plata</option>
+      <option value="Buenos Aires">Buenos Aires (CABA)</option>
+      <option value="Córdoba">Córdoba</option>
+      <option value="Rosario">Rosario</option>
+      <option value="Mendoza">Mendoza</option>
+      <option value="Otra">Otra ciudad</option>
+    </select>
+  </div>
+  <button class="btn-primary" onclick="saveCiudad()">Guardar</button>
+  <button class="btn-cancel" onclick="closeM('m-ciudad')">Cancelar</button>
+</div></div>
+
+<!-- TARJETA MILLAS -->
+<div id="m-millas" class="ov"><div class="sheet">
+  <div class="sh-handle"></div><div class="sh-title">Tarjeta para millas ✈️</div>
+  <div class="sh-sub">Cuando no haya una promo o cashback mejor disponible, la app te sugerirá usar esta tarjeta para acumular millas.</div>
+  <div class="fg"><label class="fl">Tarjeta principal</label>
+    <select class="fs" id="millas-sel">
+      <option value="">Sin preferencia</option>
+      <option value="Aerolíneas Plus (Galicia)">Aerolíneas Plus (Galicia)</option>
+      <option value="LATAM Pass (Santander)">LATAM Pass (Santander)</option>
+      <option value="American (ICBC)">American Airlines (ICBC)</option>
+      <option value="Smiles (BBVA)">Smiles GOL (BBVA)</option>
+      <option value="Naranja X">Naranja X (puntos)</option>
+      <option value="BBVA">BBVA</option>
+      <option value="Galicia">Galicia</option>
+      <option value="Santander">Santander</option>
+      <option value="ICBC">ICBC</option>
+    </select>
+  </div>
+  <button class="btn-primary" onclick="saveMillas()">Guardar</button>
+  <button class="btn-cancel" onclick="closeM('m-millas')">Cancelar</button>
+</div></div>
   <div class="sh-handle"></div><div class="sh-title">Borrar todos los datos</div>
   <div class="danger-box"><p>Esto elimina permanentemente todos tus movimientos, objetivos, servicios y configuración. No se puede deshacer.</p></div>
   <button class="btn-primary" style="background:var(--re)" onclick="resetAll()">Sí, borrar todo</button>
@@ -709,7 +752,6 @@ const SVCS_DEFAULT = [
   {id:'d7',nm:'Psicóloga',monto:32000,dia:0,mp:'Transferencia'},
   {id:'d8',nm:'Streaming',monto:0,dia:15,mp:'Mercado Pago'},
   {id:'d9',nm:'Adobe',monto:0,dia:15,mp:'BBVA'},
-  {id:'d10',nm:'Nafta',monto:0,dia:0,mp:'YPF Pay'},
   {id:'d11',nm:'Patente / Seguro',monto:0,dia:0,mp:'Efectivo'}
 ];
 
@@ -734,11 +776,15 @@ const WALLETS_DEFAULT = [
 ];
 
 const CAT_META = {
-  super:{ico:'🛒',bg:'#EEF2FF'},servicios:{ico:'🏠',bg:'#E8F4F4'},delivery:{ico:'🍕',bg:'#FFF4ED'},
-  nafta:{ico:'⛽',bg:'#F0FDF4'},ocio:{ico:'🎭',bg:'#FDF2F8'},salidas:{ico:'🍻',bg:'#FFF7ED'},
+  comida:{ico:'🍽️',bg:'#EEF2FF'},
+  super:{ico:'🛒',bg:'#EEF2FF'},   // alias legacy
+  panaderia:{ico:'🥐',bg:'#FFFBEB'}, // alias legacy
+  servicios:{ico:'🏠',bg:'#E8F4F4'},delivery:{ico:'🍕',bg:'#FFF4ED'},
+  nafta:{ico:'⛽',bg:'#F0FDF4'},ocio:{ico:'🎭',bg:'#FDF2F8'},
+  salidas:{ico:'🍻',bg:'#FDF2F8'}, // alias legacy → ocio
   pasajes:{ico:'✈️',bg:'#EFF6FF'},alquiler:{ico:'🏘️',bg:'#E8F4F4'},salud:{ico:'❤️',bg:'#FFF1F2'},
   educacion:{ico:'📚',bg:'#F0EBFF'},adobe:{ico:'🎨',bg:'#F3F0FF'},patente:{ico:'🚗',bg:'#FFF4ED'},
-  panaderia:{ico:'🥐',bg:'#FFFBEB'},hogar:{ico:'🛋️',bg:'#F5F0FF'},ropa:{ico:'👕',bg:'#FFF7ED'},
+  hogar:{ico:'🛋️',bg:'#F5F0FF'},ropa:{ico:'👕',bg:'#FFF7ED'},
   otros:{ico:'📦',bg:'#F5F5F3'},ahorro:{ico:'🎯',bg:'#E8F4F4'},ingreso:{ico:'💰',bg:'#F0FDF4'}
 };
 
@@ -750,7 +796,7 @@ const DOW = ['Domingo','Lunes','Martes','Miércoles','Jueves','Viernes','Sábado
    STATE
 ════════════════════════════════════════════ */
 let ST = {
-  profile: { ingreso:0, ingresoDesc:'', dist:{ahorro:25,super:20,ocio:10}, photo:null },
+  profile: { ingreso:0, ingresoDesc:'', dist:{ahorro:25,super:20,ocio:10}, photo:null, ciudad:'La Plata', tarjetaMillas:'' },
   txs: [],
   goals: [],
   services: JSON.parse(JSON.stringify(SVCS_DEFAULT)),
@@ -862,7 +908,7 @@ function calcBal() {
   const ocioPct    = disponibleDist * ((dist.ocio   || 10) / 100);
   const emergencia = disponibleDist * (emergenciaPct / 100);
 
-  const disp = Math.max(0, totalIng - gastos - ahorros);
+  const disp = Math.max(0, totalIng - gastos - serviciosFijos);
   return { ing, ingExtra, totalIng, gastos, ahorros, disp,
            ahorroPct, superPct, ocioPct, emergencia, serviciosFijos, disponibleDist };
 }
@@ -942,106 +988,107 @@ function refreshHoy() {
   set('hw-oci',  bal.totalIng > 0 ? fmt(bal.ocioPct   / 4): '—');
 }
 
+// BASE DE PROMOCIONES - Vigencia: hasta 31/07/2025
+const PROMOS = [
+  // NARANJA X
+  { wallet:'Naranja X', dias:'todos', comercio:'Vea, Día, Coto, Disco, Chango Más', desc:'25% OFF con débito', cat:'super', c:'#FF6B00', bt:'b-am' },
+  { wallet:'Naranja X', dias:'todos', comercio:'Subte', desc:'50% OFF con débito', cat:'transporte', c:'#FF6B00', bt:'b-am' },
+  { wallet:'Naranja X', dias:'todos', comercio:'Recarga SUBE', desc:'25% OFF', cat:'transporte', c:'#FF6B00', bt:'b-am' },
+  { wallet:'Naranja X', dias:[5,6],   comercio:'Sushipop y Lucianos', desc:'30% OFF', cat:'ocio', c:'#FF6B00', bt:'b-am' },
+  { wallet:'Naranja X', dias:'todos', comercio:'Pasajes y turismo', desc:'25% OFF', cat:'pasajes', c:'#FF6B00', bt:'b-am' },
+  { wallet:'Naranja X', dias:'todos', comercio:'Pago de servicios', desc:'25% OFF', cat:'servicios', c:'#FF6B00', bt:'b-am' },
+  { wallet:'Naranja X', dias:'todos', comercio:'Peajes (NFC débito)', desc:'50% OFF', cat:'transporte', c:'#FF6B00', bt:'b-am' },
+  // YPF APP
+  { wallet:'YPF Pay',   dias:'todos', comercio:'YPF (activando inversión)', desc:'$5.000 en próxima carga al cargar $15.000+', cat:'nafta', c:'#00A651', bt:'b-gn' },
+  { wallet:'YPF Pay',   dias:'todos', comercio:'YPF (00 a 06hs)', desc:'6% OFF', cat:'nafta', c:'#00A651', bt:'b-gn' },
+  { wallet:'YPF Pay',   dias:'todos', comercio:'Pago de servicios', desc:'6.000 puntos YPF', cat:'servicios', c:'#00A651', bt:'b-gn' },
+  { wallet:'YPF Pay',   dias:[2],     comercio:'YPF con ICBC', desc:'Hasta 15% OFF', cat:'nafta', c:'#00A651', bt:'b-gn' },
+  { wallet:'YPF Pay',   dias:[5],     comercio:'YPF con MODO BNA+', desc:'20% OFF', cat:'nafta', c:'#00A651', bt:'b-gn' },
+  { wallet:'YPF Pay',   dias:[5],     comercio:'YPF con Credicoop', desc:'20% OFF', cat:'nafta', c:'#00A651', bt:'b-gn' },
+  // PERSONAL PAY
+  { wallet:'Personal Pay', dias:'todos', comercio:'Almundo', desc:'10% OFF (máx $100.000)', cat:'pasajes', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:'todos', comercio:'Colonia Express', desc:'25% OFF en pasajes', cat:'pasajes', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:'todos', comercio:'Plusmar', desc:'20% OFF en pasajes', cat:'pasajes', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:[2],     comercio:'Freddo', desc:'2×1 (martes)', cat:'ocio', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:'todos', comercio:'Freddo', desc:'25% OFF en kilo y cuarto', cat:'ocio', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:'todos', comercio:'Café Martínez', desc:'25% OFF hasta $7.000', cat:'ocio', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:'todos', comercio:'Antares', desc:'30% OFF hasta $30.000', cat:'ocio', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:'todos', comercio:'Rappi (primera compra)', desc:'50% OFF máx $6.000', cat:'delivery', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:'todos', comercio:'Starbucks (mañana, NFC)', desc:'20% OFF', cat:'ocio', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:[4],     comercio:'Día', desc:'15% de reintegro', cat:'super', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:[5,6,0], comercio:'Chango Más', desc:'15% OFF', cat:'super', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:[4],     comercio:'Coto', desc:'30% OFF', cat:'super', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:'todos', comercio:'Pigmento', desc:'10% OFF en cosmética', cat:'otros', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:'todos', comercio:'WiFi', desc:'10% de reintegro', cat:'servicios', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:[5],     comercio:'Arredo', desc:'10% OFF tienda física', cat:'hogar', c:'#7C3AED', bt:'b-pu' },
+  { wallet:'Personal Pay', dias:'todos', comercio:'Coderhouse', desc:'20% OFF', cat:'educacion', c:'#7C3AED', bt:'b-pu' },
+  // MERCADO PAGO
+  { wallet:'Mercado Pago', dias:[4],     comercio:'Carrefour', desc:'15% OFF', cat:'super', c:'#00B1EA', bt:'b-p' },
+  { wallet:'Mercado Pago', dias:[5],     comercio:'Coto', desc:'25% OFF', cat:'super', c:'#00B1EA', bt:'b-p' },
+  { wallet:'Mercado Pago', dias:[6,0],   comercio:'Coto (QR)', desc:'20% OFF', cat:'super', c:'#00B1EA', bt:'b-p' },
+  { wallet:'Mercado Pago', dias:[2],     comercio:'Chango Más', desc:'15% OFF', cat:'super', c:'#00B1EA', bt:'b-p' },
+  { wallet:'Mercado Pago', dias:[3],     comercio:'Día (online y físico)', desc:'10% OFF', cat:'super', c:'#00B1EA', bt:'b-p' },
+  { wallet:'Mercado Pago', dias:'todos', comercio:'Mercado Libre supermercado', desc:'35% OFF', cat:'super', c:'#00B1EA', bt:'b-p' },
+  { wallet:'Mercado Pago', dias:[4],     comercio:'Mateu Sports', desc:'20% OFF tienda física', cat:'otros', c:'#00B1EA', bt:'b-p' },
+];
+
 function renderTips() {
   const today = new Date();
   const dom   = today.getDate();
-  const dow   = today.getDay();
+  const dow   = today.getDay(); // 0=dom,1=lun,2=mar,3=mié,4=jue,5=vie,6=sáb
   const bal   = calcBal();
   const activeWallets = ST.wallets.filter(w => w.on).map(w => w.nm);
   const tips  = [];
 
-  // servicios urgentes
+  // 1 — VENCIMIENTOS URGENTES (máx 3 días)
   ST.services.forEach(s => {
     if (!s.dia || !s.monto) return;
     const diff = s.dia - dom;
     if (diff >= 0 && diff <= 3) {
       const w = diff === 0 ? 'hoy' : diff === 1 ? 'mañana' : `en ${diff} días`;
-      const mp = s.mp;
-      const cashback = mp === 'Lemon Cash' ? ' → 5% cashback' : mp === 'Personal Pay' ? ' → posible cashback' : '';
+      const extra = s.mp === 'Lemon Cash' ? ' → 5% cashback' : s.mp === 'Naranja X' ? ' → 25% OFF en servicios' : '';
       tips.push({ c:'#E8642A', bt:'b-or', b:`Vence ${w}`,
-        t:`<strong>${s.nm}</strong> vence ${w}. Pagalo con <strong>${mp}</strong>${cashback}.` });
+        t:`<strong>${s.nm}</strong> vence ${w}. Pagalo con <strong>${s.mp}</strong>${extra}.` });
     }
   });
 
-  // SUPERMERCADOS — promos concretas por billetera activa
-  if (dow === 1 && activeWallets.includes('Cuenta DNI')) {
-    tips.push({ c:'#1A8A5A', bt:'b-gn', b:'Hoy · Cuenta DNI',
-      t:'Conviene hacer el super hoy con <strong>Cuenta DNI</strong> — 30% OFF en <strong>Disco, Vea y Carrefour</strong>.' });
-  }
-  if (dow === 3 && activeWallets.includes('Personal Pay')) {
-    tips.push({ c:'#1A8A5A', bt:'b-gn', b:'Miércoles · Personal Pay',
-      t:'Hoy <strong>Personal Pay</strong> tiene descuentos en <strong>Coto y Chango Más</strong>. Aprovechá para el super.' });
-  }
-  if (dom >= 1 && dom <= 5 && activeWallets.includes('BBVA')) {
-    tips.push({ c:'#1A8A5A', bt:'b-gn', b:'Primeros días · BBVA',
-      t:'<strong>BBVA</strong> tiene reintegro en <strong>Carrefour y Día</strong> los primeros días del mes.' });
-  }
-  if (activeWallets.includes('Naranja X')) {
-    if (dow === 5) tips.push({ c:'#1A8A5A', bt:'b-gn', b:'Viernes · Naranja X',
-      t:'<strong>Naranja X</strong> tiene descuentos los viernes en <strong>Vital, Nini y comercios adheridos</strong>.' });
+  // 2 — PROMOS DEL DÍA (filtrando por billeteras activas y día)
+  PROMOS.forEach(p => {
+    if (!activeWallets.includes(p.wallet)) return;
+    const aplica = p.dias === 'todos' || (Array.isArray(p.dias) && p.dias.includes(dow));
+    if (!aplica) return;
+    tips.push({ c: p.c, bt: p.bt,
+      b: `${p.wallet} · ${p.desc}`,
+      t: `<strong>${p.comercio}</strong> — ${p.desc} con <strong>${p.wallet}</strong>.` });
+  });
+
+  // 3 — PAGO INTELIGENTE si no hay promos activas
+  const tienePromos = tips.filter(t => !t.b.startsWith('Vence')).length > 0;
+  const tarjetaMillas = ST.profile.tarjetaMillas || '';
+  if (!tienePromos) {
+    if (activeWallets.includes('Lemon Cash')) {
+      tips.push({ c:'#F59E0B', bt:'b-am', b:'Sin promos hoy · Lemon QR',
+        t:'No hay descuentos específicos hoy. Usá <strong>Lemon QR</strong> en cualquier comercio para acumular cashback automáticamente.' });
+    } else if (tarjetaMillas) {
+      tips.push({ c:'#F59E0B', bt:'b-am', b:'Acumulá millas',
+        t:`Sin promos activas hoy. Usá <strong>${tarjetaMillas}</strong> para sumar millas en tus gastos habituales.` });
+    } else if (activeWallets.includes('Naranja X')) {
+      tips.push({ c:'#FF6B00', bt:'b-am', b:'Sin promos · Naranja X',
+        t:'Usá <strong>Naranja X débito</strong> hoy — tiene 50% en subte y peajes y 25% en supermercados todos los días.' });
+    }
   }
 
-  // OCIO — promos de cine, teatro, gastronomía, cervecerías, cafeterías
-  if (activeWallets.includes('Personal Pay') && (dow === 2 || dow === 4)) {
-    tips.push({ c:'#5C3DC0', bt:'b-pu', b:'Cine · Personal Pay',
-      t:'<strong>Personal Pay</strong> tiene descuentos en <strong>Cinépolis y Hoyts</strong> los martes y jueves.' });
-  }
-  if (activeWallets.includes('Cuenta DNI') && dow === 2) {
-    tips.push({ c:'#5C3DC0', bt:'b-pu', b:'Martes · Cuenta DNI',
-      t:'<strong>Cuenta DNI</strong> tiene 2×1 en cines adheridos los martes. Ideal para salir.' });
-  }
-  if (activeWallets.includes('Mercado Pago') && (dow === 5 || dow === 6)) {
-    tips.push({ c:'#5C3DC0', bt:'b-pu', b:'Fin de semana · MP',
-      t:'<strong>Mercado Pago</strong> tiene cashback en gastronomía, cafeterías y cervecerías los fines de semana en La Plata.' });
-  }
-  if (activeWallets.includes('Lemon Cash') && dow === 6) {
-    tips.push({ c:'#5C3DC0', bt:'b-pu', b:'Sábado · Lemon QR',
-      t:'Usá <strong>Lemon QR</strong> en bares, cervecerías y restaurantes para acumular cashback en cualquier comercio adherido.' });
-  }
-  // eventos La Plata
-  if (dow === 5 || dow === 6 || dow === 0) {
-    tips.push({ c:'#5C3DC0', bt:'b-pu', b:'Este finde · La Plata',
-      t:'Fin de semana en La Plata: revisá la cartelera del <strong>Teatro Argentino</strong> y eventos en el <strong>Pasaje Dardo Rocha</strong>. Pagá con QR para sumar cashback.' });
-  }
-
-  // NAFTA
-  if (dow === 4 && activeWallets.includes('Personal Pay')) {
-    tips.push({ c:'#2D6A6A', bt:'b-p', b:'Jueves · nafta',
-      t:'Cargá nafta hoy — <strong>Personal Pay</strong> tiene 20% cashback en YPF los jueves.' });
-  }
-
-  // PASAJES
-  if (dow === 2) {
-    tips.push({ c:'#C07B10', bt:'b-am', b:'Martes de vuelos',
-      t:'<strong>JetSMART y Flybondi</strong> publican precios flash los martes. Revisá sus apps o newsletters.' });
-  }
-  if (dow === 5 || dow === 6 || dow === 0) {
-    tips.push({ c:'#5C3DC0', bt:'b-pu', b:'Pasajes · Este finde',
-      t:'Buen momento para buscar vuelos en <strong>Google Flights o Skyscanner</strong>. Activá alertas de precio para tu destino.' });
-  }
-
-  // REGLA DE PAGO INTELIGENTE — cuando no hay promo activa obvia
-  const hasLemon = activeWallets.includes('Lemon Cash');
-  const tipsCount = tips.filter(t => !t.b.includes('Vence')).length;
-  if (tipsCount === 0 && hasLemon) {
-    tips.push({ c:'#F59E0B', bt:'b-am', b:'Pago inteligente',
-      t:'Sin promos activas hoy. Usá <strong>Lemon QR</strong> en cualquier comercio para acumular cashback automáticamente.' });
-  } else if (tipsCount === 0 && !hasLemon && activeWallets.includes('Naranja X')) {
-    tips.push({ c:'#FF6B00', bt:'b-am', b:'Pago inteligente',
-      t:'Sin promos activas hoy. Usá <strong>Naranja X</strong> para acumular puntos en tus gastos habituales.' });
-  }
-
-  // consejo de presupuesto
+  // 4 — PRESUPUESTO SEMANAL
   if (bal.totalIng > 0) {
     const max = Math.round(bal.ocioPct / 4);
-    tips.push({ c:'#E8642A', bt:'b-or', b:'Tu presupuesto semanal',
-      t:`Tenés <strong>${fmt(max)}</strong> para ocio y salidas esta semana. Si lo respetás, cumplís tu distribución mensual.` });
+    tips.push({ c:'#1C4A4A', bt:'b-p', b:'Tu semana',
+      t:`Tenés <strong>${fmt(max)}</strong> para ocio y salidas esta semana.` });
   }
 
-  // fallback
+  // 5 — FALLBACK
   if (!tips.length) {
     tips.push({ c:'#2D6A6A', bt:'b-p', b:'Empezá aquí',
-      t:'Configurá tu ingreso mensual en <strong>Perfil</strong> para que la app calcule tus recomendaciones personalizadas.' });
+      t:'Configurá tu ingreso en <strong>Perfil</strong> para ver recomendaciones personalizadas.' });
   }
 
   $('tips-container').innerHTML = tips.map(t =>
@@ -1269,14 +1316,18 @@ function setFilter(f, btn) {
   renderTxList();
   // mostrar presupuesto de categoría
   const bar = $('cat-budget-bar');
-  const catBudget = { super: 'superPct', ocio: 'ocioPct', salidas: 'ocioPct' };
+  const catBudget = { comida: 'superPct', ocio: 'ocioPct' };
   if (catBudget[f] && ST.profile.ingreso > 0) {
     const bal = calcBal();
     const assigned = bal[catBudget[f]] || 0;
-    // ocio y salidas comparten el mismo pool
-    const spent = ST.txs.filter(t => t.tipo === 'gasto' && (t.cat === f || (f === 'ocio' && t.cat === 'salidas') || (f === 'salidas' && t.cat === 'ocio'))).reduce((a,t) => a + t.monto, 0);
+    // comida incluye legacy: super, panaderia, comida
+    // ocio incluye legacy: ocio, salidas
+    const comidasCats = ['comida','super','panaderia'];
+    const ocioCats    = ['ocio','salidas'];
+    const filterCats  = f === 'comida' ? comidasCats : ocioCats;
+    const spent = ST.txs.filter(t => t.tipo === 'gasto' && filterCats.includes(t.cat)).reduce((a,t) => a + t.monto, 0);
     const left  = Math.max(0, assigned - spent);
-    const labels = { super:'Supermercado', ocio:'Ocio y salidas', salidas:'Ocio y salidas' };
+    const labels = { comida:'Comida', ocio:'Ocio y salidas' };
     set('cat-budget-title', labels[f] || f);
     set('cat-b-total',  fmt(assigned));
     set('cat-b-spent',  fmt(spent));
@@ -1292,6 +1343,8 @@ function renderTxList() {
   if (curFilter === 'gasto')   txs = txs.filter(t => t.tipo === 'gasto');
   else if (curFilter === 'ingreso') txs = txs.filter(t => t.tipo === 'ingreso');
   else if (curFilter === 'ahorro')  txs = txs.filter(t => t.tipo === 'ahorro');
+  else if (curFilter === 'comida')  txs = txs.filter(t => ['comida','super','panaderia'].includes(t.cat));
+  else if (curFilter === 'ocio')    txs = txs.filter(t => ['ocio','salidas'].includes(t.cat));
   else if (curFilter !== 'todos')   txs = txs.filter(t => t.cat === curFilter);
 
   const list = $('tx-list');
@@ -1334,16 +1387,22 @@ function saveIngreso() {
 
 function previewDist() {
   const bal = calcBal();
-  if (!bal.totalIng) return;
+  // calcular % que representan los gastos fijos sobre el ingreso total
+  const fijoPct = bal.totalIng > 0 ? Math.round(bal.serviciosFijos / bal.totalIng * 100) : 0;
+  if ($('d-f')) $('d-f').value = fijoPct || '—';
   const a = parseFloat($('d-a').value) || 0;
   const s = parseFloat($('d-s').value) || 0;
   const o = parseFloat($('d-o').value) || 0;
   const e = parseFloat($('d-e').value) || 0;
   const total = a + s + o + e;
-  const disp = bal.disponibleDist;
   const prev = $('dist-preview');
   if (prev) {
-    prev.innerHTML = `Servicios fijos: <strong>${fmt(bal.serviciosFijos)}</strong> · Distribuible: <strong>${fmt(disp)}</strong> · Asignado: <strong>${total}%</strong> · Libre: <strong>${Math.max(0,100-total)}%</strong>`;
+    const libre = Math.max(0, 100 - total);
+    const color = total > 100 ? '#A0381A' : '#0F6040';
+    prev.style.color = color;
+    prev.innerHTML = bal.totalIng
+      ? `Gastos fijos: <strong>${fmt(bal.serviciosFijos)}</strong> (${fijoPct}%) · Asignado: <strong>${total}%</strong> · Libre: <strong>${libre}%</strong>`
+      : 'Configurá tu ingreso para ver el cálculo.';
   }
 }
 
@@ -1352,10 +1411,10 @@ function saveDist() {
   const s = parseFloat($('d-s').value) || 20;
   const o = parseFloat($('d-o').value) || 10;
   const e = parseFloat($('d-e').value) || 2;
-  if (a + s + o + e > 98) { toast('Los porcentajes no pueden superar el 98%'); return; }
+  if (a + s + o + e > 100) { toast('Los porcentajes no pueden superar el 100%'); return; }
   ST.profile.dist = { ahorro: a, super: s, ocio: o, emergencia: e };
   persist();
-  set('cfg-dist-val', `Ahorro ${a}% · Super ${s}% · Ocio ${o}% · Emerg. ${e}%`);
+  set('cfg-dist-val', `Comida ${s}% · Ocio ${o}% · Ahorro ${a}% · Emerg. ${e}%`);
   closeM('m-dist');
   toast('Distribución guardada ✓');
 }
@@ -1439,22 +1498,51 @@ function saveGoal() {
   // renderizar objetivos (el DOM existe aunque la pantalla no sea la activa)
   renderGoals();
 
-  // CAMBIO 7: calcular si el objetivo es alcanzable
+  // CAMBIO 8: calcular si el objetivo es alcanzable
   if (meta > 0 && ST.profile.ingreso > 0) {
     const bal = calcBal();
-    const ahorroMensual = bal.ahorroPct;
+    const ahorroMensual = bal.ahorroPct; // monto mensual absoluto destinado a ahorro
     const goalObj = ST.goals.find(g => g.nombre === nm);
-    const acum = goalObj ? (goalObj.acumulado || 0) : 0;
-    const falta = meta - acum;
-    if (falta > 0 && ahorroMensual > 0) {
-      const meses = Math.ceil(falta / ahorroMensual);
-      const fechaEstimada = new Date();
-      fechaEstimada.setMonth(fechaEstimada.getMonth() + meses);
-      const mesNm = MON[fechaEstimada.getMonth()];
-      const anio = fechaEstimada.getFullYear();
-      toast(`Meta alcanzable en ~${meses} meses (${mesNm} ${anio}) con tu ahorro actual 🎯`);
+    const acum  = goalObj ? (goalObj.acumulado || 0) : 0;
+    const falta = Math.max(0, meta - acum);
+
+    if (falta <= 0) {
+      toast('¡Meta ya alcanzada! 🎉');
     } else if (ahorroMensual <= 0) {
-      toast('Configurá tu distribución de ahorro para ver cuándo alcanzás esta meta.');
+      toast('Configurá el % de ahorro en Distribución para ver cuándo alcanzás esta meta.');
+    } else {
+      // si el usuario ingresó fecha objetivo, calcular cuánto hay que ahorrar por mes
+      let msg = '';
+      if (fecha) {
+        // parsear fecha texto como "Diciembre 2025"
+        const parts = fecha.trim().split(' ');
+        const mesNombre = parts[0] ? parts[0].toLowerCase() : '';
+        const anioObj   = parseInt(parts[1]) || 0;
+        const mesIdx    = MON.findIndex(m => m.toLowerCase() === mesNombre || m.toLowerCase().startsWith(mesNombre.substring(0,3)));
+        if (anioObj > 0 && mesIdx >= 0) {
+          const fechaObj = new Date(anioObj, mesIdx, 1);
+          const hoy      = new Date();
+          const mesesHasta = Math.max(1, Math.round((fechaObj - hoy) / (1000 * 60 * 60 * 24 * 30)));
+          const necesario  = Math.ceil(falta / mesesHasta);
+          if (necesario <= ahorroMensual) {
+            msg = `Con tu ahorro actual (${fmt(ahorroMensual)}/mes) llegás antes de ${fecha} 🎯`;
+          } else {
+            msg = `Para llegar a ${fecha} necesitás ahorrar ${fmt(necesario)}/mes (tenés ${fmt(ahorroMensual)}/mes).`;
+          }
+        }
+      }
+      if (!msg) {
+        // sin fecha: calcular meses estimados
+        const meses = Math.ceil(falta / ahorroMensual);
+        if (meses > 120) {
+          msg = `Con el ahorro actual tardarías más de 10 años. Considerá aumentar el % de ahorro.`;
+        } else {
+          const fechaEst = new Date();
+          fechaEst.setMonth(fechaEst.getMonth() + meses);
+          msg = `Alcanzás la meta en ~${meses} ${meses === 1 ? 'mes' : 'meses'} (${MON[fechaEst.getMonth()]} ${fechaEst.getFullYear()}) 🎯`;
+        }
+      }
+      toast(msg);
     }
   }
 }
@@ -1571,7 +1659,7 @@ function refreshPerfil() {
   renderSvcRows();
   renderWallets();
   const d = ST.profile.dist;
-  set('cfg-dist-val', `Ahorro ${d.ahorro||25}% · Super ${d.super||20}% · Ocio ${d.ocio||10}% · Emerg. ${d.emergencia||2}%`);
+  set('cfg-dist-val', `Comida ${d.super||20}% · Ocio ${d.ocio||10}% · Ahorro ${d.ahorro||25}% · Emerg. ${d.emergencia||2}%`);
   set('cfg-ing', ST.profile.ingreso > 0 ? fmt(ST.profile.ingreso) + ' / mes' : 'Sin configurar');
   // pre-fill forms
   if (ST.profile.ingreso) { $('ing-v').value = ST.profile.ingreso; $('ing-d').value = ST.profile.ingresoDesc || ''; }
@@ -1579,6 +1667,12 @@ function refreshPerfil() {
   $('d-s').value = d.super  || 20;
   $('d-o').value = d.ocio   || 10;
   if ($('d-e')) $('d-e').value = d.emergencia || 2;
+  set('cfg-ciudad',  ST.profile.ciudad || 'La Plata');
+  set('cfg-millas',  ST.profile.tarjetaMillas || 'Sin configurar');
+  if ($('ciudad-sel')) $('ciudad-sel').value = ST.profile.ciudad || 'La Plata';
+  if ($('millas-sel')) $('millas-sel').value = ST.profile.tarjetaMillas || '';
+  // mostrar % gastos fijos calculado
+  previewDist();
 }
 
 function updateVcard() {
@@ -1804,7 +1898,22 @@ function scheduleServiceNotifications() {
   });
 }
 
-/* ── RESET ── */
+function saveCiudad() {
+  ST.profile.ciudad = $('ciudad-sel').value;
+  persist();
+  set('cfg-ciudad', ST.profile.ciudad);
+  closeM('m-ciudad');
+  toast('Ciudad guardada ✓');
+}
+
+function saveMillas() {
+  ST.profile.tarjetaMillas = $('millas-sel').value;
+  persist();
+  set('cfg-millas', ST.profile.tarjetaMillas || 'Sin configurar');
+  closeM('m-millas');
+  toast('Tarjeta guardada ✓');
+}
+
 function resetAll() {
   Object.values(KEYS).forEach(k => localStorage.removeItem(k));
   location.reload();
